@@ -1,0 +1,143 @@
+/* Navbar Styling */
+.navbar {
+    padding: 15px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.navbar-brand img {
+    height: 40px;
+}
+
+.navbar-nav .nav-link {
+    font-size: 16px;
+    color: #333;
+    margin: 0 15px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff;
+}
+
+.icons img {
+    height: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.icons img:hover {
+    opacity: 0.8;
+}
+
+/* Hero Section */
+.hero-overlay {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-overlay img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 50%);
+    z-index: 1;
+}
+
+.carousel-caption {
+    z-index: 2;
+    text-align: center;
+}
+
+.carousel-caption h1 {
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+.carousel-caption p {
+    color: #ddd;
+}
+
+/* Search Bar Styling */
+.search-group {
+    max-width: 400px;
+    transition: all 0.3s ease;
+    margin-left: auto;
+}
+
+.search-group .form-control {
+    border: none;
+    box-shadow: none;
+}
+
+.search-group .btn-dark {
+    background-color: #333;
+    border: none;
+    padding: 0 20px;
+}
+
+.search-group .btn-dark:hover {
+    background-color: #000;
+}
+
+/* Sidebar Styling */
+.sticky-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    padding-top: 20px;
+    padding-left: 5px; /* Reduced padding for closer alignment */
+}
+
+.sidebar-aligned {
+    margin-left: 10px; /* Reduced margin to bring it closer to the logo */
+}
+
+.sidebar-aligned ul {
+    margin: 0;
+    padding: 0;
+}
+
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f1;
+    padding: 8px 10px; /* Reduced padding for tighter spacing */
+}
+
+.category-item a {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+    flex-grow: 1;
+    margin-left: 5px; /* Slight margin for clean spacing */
+}
+
+.category-item span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-left: 10px; /* Maintain spacing between text and ">" */
+}
+
+.category-item:hover {
+    background-color: #f8f8f8;
+}
+
+.category-item:hover span {
+    color: #007bff;
+}

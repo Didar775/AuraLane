@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}TrendHive - Home{% endblock %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section (Enhanced with Gradient Overlay) -->
+<div id="heroCarousel" class="carousel slide mb-5 position-relative" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+            <div class="hero-overlay position-relative">
+                <div class="gradient-overlay"></div>
+                <img src="{% static 'images/hero1.png' %}" class="d-block w-100" alt="Hero Image 1">
+            </div>
+            <div class="carousel-caption d-none d-md-block">
+                <h1 class="text-light">Discover the Latest Tech</h1>
+                <p class="text-light">Shop the newest arrivals and best deals today!</p>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+            <div class="hero-overlay position-relative">
+                <div class="gradient-overlay"></div>
+                <img src="{% static 'images/hero2.png' %}" class="d-block w-100" alt="Hero Image 2">
+            </div>
+            <div class="carousel-caption d-none d-md-block">
+                <h1 class="text-light">Cutting-Edge Gadgets</h1>
+                <p class="text-light">Upgrade your life with our top tech picks.</p>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="carousel-item">
+            <div class="hero-overlay position-relative">
+                <div class="gradient-overlay"></div>
+                <img src="{% static 'images/hero3.png' %}" class="d-block w-100" alt="Hero Image 3">
+            </div>
+            <div class="carousel-caption d-none d-md-block">
+                <h1 class="text-light">Unbeatable Prices</h1>
+                <p class="text-light">Don't miss out on our exclusive offers.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Carousel Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+{% endblock %}

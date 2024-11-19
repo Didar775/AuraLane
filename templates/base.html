@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TrendHive - Tech Store{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container">
+            <!-- Logo -->
+            <a class="navbar-brand" href="/">
+                <img src="{% static 'images/logo.png' %}" alt="TrendHive" style="height: 40px;">
+            </a>
+
+            <!-- Toggler for Mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'catalog:catalog_list' %}">Catalog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Brands</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Deals</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Gift Cards</a></li>
+                </ul>
+
+                <!-- Icons Section -->
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Search Icon -->
+                    <div class="dropdown">
+                        <a href="#" id="searchDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition-colors group-hover:fill-primary"><path class="transition-colors group-hover:fill-primary" d="M25.069 24.162L21.3454 20.4704C22.7472 18.8422 23.4633 16.734 23.3431 14.5888C23.223 12.4437 22.276 10.4286 20.7012 8.96709C19.1264 7.50556 17.0464 6.71138 14.8982 6.75145C12.7501 6.79151 10.7011 7.66269 9.18191 9.18191C7.66269 10.7011 6.79151 12.7501 6.75145 14.8982C6.71138 17.0464 7.50557 19.1264 8.96709 20.7012C10.4286 22.276 12.4437 23.223 14.5888 23.3431C16.734 23.4633 18.8422 22.7472 20.4704 21.3454L24.194 25.069C24.3162 25.1736 24.4733 25.2283 24.6341 25.2221C24.7948 25.2159 24.9473 25.1493 25.0611 25.0355C25.1748 24.9218 25.2414 24.7693 25.2476 24.6085C25.2539 24.4478 25.1992 24.2906 25.0945 24.1684L25.069 24.162ZM15.0478 22.0735C13.6583 22.0735 12.3 21.6615 11.1446 20.8895C9.98923 20.1175 9.08873 19.0202 8.55697 17.7364C8.02522 16.4527 7.88609 15.04 8.15717 13.6772C8.42826 12.3144 9.09739 11.0625 10.0799 10.0799C11.0625 9.09739 12.3144 8.42826 13.6772 8.15717C15.04 7.88609 16.4527 8.02522 17.7364 8.55697C19.0202 9.08873 20.1175 9.98923 20.8895 11.1446C21.6615 12.3 22.0735 13.6583 22.0735 15.0478C22.0735 16.9112 21.3333 18.6982 20.0157 20.0157C18.6982 21.3333 16.9112 22.0735 15.0478 22.0735Z" fill="black"></path></svg>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="searchDropdown" style="width: 300px;">
+                            <form method="get" action="/">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search for products..." name="q" style="border: 1px solid #ccc; border-radius: 0.25rem;">
+                                    <button class="btn btn-dark" type="submit">Search</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Favorite Icon -->
+                    <a href="#" title="Favorites">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition-colors group-hover:fill-primary"><path class="transition-colors group-hover:fill-primary" d="M23.755 9.37846C22.7863 8.40983 21.504 7.88042 20.1353 7.88042C18.7667 7.88042 17.4804 8.41375 16.5118 9.38238L16.0059 9.88827L15.4922 9.37454C14.5236 8.40591 13.2334 7.86865 11.8647 7.86865C10.5 7.86865 9.21375 8.40199 8.24904 9.3667C7.28041 10.3353 6.74708 11.6216 6.751 12.9902C6.751 14.3589 7.28825 15.6412 8.25688 16.6098L15.6216 23.9746C15.7236 24.0765 15.8608 24.1314 15.9942 24.1314C16.1275 24.1314 16.2647 24.0805 16.3667 23.9785L23.7471 16.6255C24.7157 15.6569 25.2491 14.3706 25.2491 13.002C25.253 11.6334 24.7236 10.3471 23.755 9.37846ZM23.002 15.8765L15.9942 22.8569L9.00198 15.8647C8.23335 15.0961 7.80982 14.0765 7.80982 12.9902C7.80982 11.904 8.22943 10.8843 8.99806 10.1196C9.76277 9.35493 10.7824 8.9314 11.8647 8.9314C12.951 8.9314 13.9745 9.35493 14.7432 10.1236L15.6294 11.0098C15.8373 11.2177 16.1706 11.2177 16.3785 11.0098L17.2569 10.1314C18.0255 9.36277 19.0491 8.93924 20.1314 8.93924C21.2138 8.93924 22.2334 9.36277 23.002 10.1275C23.7706 10.8961 24.1903 11.9157 24.1903 13.002C24.1942 14.0883 23.7706 15.1079 23.002 15.8765Z" fill="black"></path></svg>
+                    </a>
+                    <!-- Profile Icon -->
+                    <a href="#" title="Profile">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition-colors w-[32px] h-[32px] md:w-[24px] md:h-[24px] lg:w-[32px] lg:h-[32px] group-hover:stroke-primary"><path class="transition-colors w-[32px] h-[32px] md:w-[24px] md:h-[24px] lg:w-[32px] lg:h-[32px] group-hover:stroke-primary" d="M16.4115 14C18.7217 14 20.5945 12.2091 20.5945 9.99986C20.5945 7.79066 18.7217 5.99976 16.4115 5.99976C14.1013 5.99976 12.2285 7.79066 12.2285 9.99986C12.2285 12.2091 14.1013 14 16.4115 14Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"></path><path class="transition-colors w-[32px] h-[32px] md:w-[24px] md:h-[24px] lg:w-[32px] lg:h-[32px] group-hover:stroke-primary" d="M25.8236 25.9998C25.8236 21.0291 21.6097 16.9995 16.4118 16.9995C11.2138 16.9995 7 21.0291 7 25.9998" stroke="black" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    </a>
+                    <!-- Cart Icon -->
+                    <a href="#" title="Cart">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition-colors group-hover:fill-primary"><path class="transition-colors group-hover:fill-primary" d="M23.3851 11.1451C23.3692 11.024 23.3096 10.913 23.2175 10.8328C23.1254 10.7527 23.0072 10.709 22.8851 10.7101H20.1301V9.71008C20.1301 8.61473 19.695 7.56425 18.9205 6.78973C18.1459 6.0152 17.0955 5.58008 16.0001 5.58008C14.9048 5.58008 13.8543 6.0152 13.0798 6.78973C12.3052 7.56425 11.8701 8.61473 11.8701 9.71008V10.7101H9.11011C8.98804 10.709 8.8698 10.7527 8.77769 10.8328C8.68559 10.913 8.62598 11.024 8.61011 11.1451L6.75512 25.2151C6.74568 25.288 6.75243 25.3621 6.7749 25.4321C6.79737 25.5021 6.835 25.5663 6.88512 25.6201C7.09512 25.8451 7.32511 26.0751 7.57511 26.3001C7.66681 26.3834 7.7862 26.4298 7.91012 26.4301H24.0901C24.214 26.4298 24.3334 26.3834 24.4251 26.3001C24.6701 26.0751 24.9251 25.8451 25.1151 25.6201C25.1652 25.5663 25.2029 25.5021 25.2253 25.4321C25.2478 25.3621 25.2546 25.288 25.2451 25.2151L23.3851 11.1451ZM12.8851 9.70008C12.8851 8.86995 13.2149 8.07382 13.8019 7.48683C14.3889 6.89985 15.185 6.57008 16.0151 6.57008C16.8452 6.57008 17.6414 6.89985 18.2284 7.48683C18.8153 8.07382 19.1451 8.86995 19.1451 9.70008V10.7001H12.8701L12.8851 9.70008ZM23.8851 25.4301H8.10511L7.77512 25.1101L9.54512 11.7101H22.4501L24.2201 25.1101L23.8851 25.4301Z" fill="black"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Block -->
+    <main>
+        {% block content %}
+        <!-- Content will be inserted here from child templates -->
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center py-4">
+        <p>&copy; 2024 TrendHive. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
