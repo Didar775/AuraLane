@@ -1,25 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}Catalog{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row">
         <!-- Left Sidebar -->
-        <div class="col-2">
-            <div class="sticky-sidebar">
-                <ul class="list-unstyled m-0">
-    {% for category in categories %}
-    <li class="category-item">
-        <a href="{% url 'catalog:catalog-items' %}?category_id={{ category.id }}">
-            <span class="category-name">{{ category.name }}</span>
-            <span class="category-arrow">&gt;</span>
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-
-            </div>
+        <div class="col-2 sticky-sidebar">
+            <ul class="list-unstyled">
+                {% for category in categories %}
+                <li class="category-item">
+                    <a href="{% url 'catalog:catalog-items' %}?category_id={{ category.id }}">
+                        <span class="category-name">{{ category.name }}</span>
+                        <span class="category-arrow">&gt;</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
 
         <!-- Product Grid -->
@@ -27,16 +25,41 @@
             <div class="product-container">
                 {% for item in items %}
                 <div class="product-card">
+                    <!-- Product Image -->
                     <div class="product-image-container">
                         {% if item.photos.first %}
-                            <img src="{{ item.photos.first.photo.url }}" alt="{{ item.name }}" class="product-image">
+                        <img src="{{ item.photos.first.photo.url }}" alt="{{ item.name }}" class="product-image">
+                        {% else %}
+                        <div class="no-photo">No Image</div>
                         {% endif %}
+                        <button class="favorite-btn" onclick="toggleFavorite(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="heart-icon">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </button>
                     </div>
+
+                    <!-- Product Details -->
                     <div class="product-details">
+                        <div class="category">{{ item.category.name }}</div>
                         <h6 class="title">{{ item.name }}</h6>
-                        <div class="rating">★★★★★ 0</div>
                         <p class="price">{{ item.sale_price }} ₸</p>
+                        <div class="rating">
+                            {% for i in range %}
+                            {% if i <= item.rating %}
+                            <span class="star filled">★</span>
+                            {% else %}
+                            <span class="star">★</span>
+                            {% endif %}
+                            {% endfor %}
+                            <span class="rating-count">({{ item.rating_count }})</span>
+                        </div>
                     </div>
+
+                    <!-- Add to Cart Button -->
+                    <button class="add-to-cart-btn" onclick="toggleCart(this)">
+                        <span>+</span>
+                    </button>
                 </div>
                 {% endfor %}
             </div>

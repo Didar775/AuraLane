@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, request
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Item, Category, Review, FavoriteItem
 from .forms import ItemForm, ReviewForm
@@ -32,6 +33,8 @@ class CategoryListView(ListView):
                 in_stock=True
             ).select_related('category')
 
+        context['range'] = range(1, 6)
+
         return context
 
 
@@ -51,27 +54,6 @@ class ItemListView(ListView):
 
         return queryset
 
-
-# def items_by_category(request, category_id):
-#     items = Item.objects.filter(category_id=category_id)
-#     items_data = [{
-#         'name': item.name,
-#         'price': item.sale_price,
-#         'image': item.photos.first().photo.url if item.photos.exists() else '',
-#     } for item in items]
-#
-#     return JsonResponse({'items': items_data})
-
-
-# ListView for Items
-# class ItemListView(ListView):
-#     model = Item
-#     template_name = 'catalog/item_list.html'
-#     context_object_name = 'items'
-#     paginate_by = 10
-
-
-# DetailView for an Item
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'catalog/item_detail.html'
@@ -84,14 +66,37 @@ class ItemDetailView(DetailView):
         return context
 
 
-@login_required
-def toggle_favorite(request, item_id):
-    item = get_object_or_404(Item, id=item_id)
-    favorite, created = FavoriteItem.objects.get_or_create(user=request.user, item=item)
-    if not created:
-        favorite.delete()
-        return JsonResponse({'message': 'Removed from favorites'}, status=200)
-    return JsonResponse({'message': 'Added to favorites'}, status=200)
+
+@csrf_exempt
+def toggle_favorite(request, product_id):
+    if request.method == "POST":
+        product = get_object_or_404(Item, id=product_id)
+        user = request.user
+
+        # Toggle favorite
+        if product in user.profile.favorites.all():
+            user.profile.favorites.remove(product)
+            is_favorite = False
+        else:
+            user.profile.favorites.add(product)
+            is_favorite = True
+
+        return JsonResponse({'is_favorite': is_favorite})
+
+
+@csrf_exempt
+def toggle_cart(request, product_id):
+    if request.method == 'POST':
+        product = get_object_or_404(Item, id=product_id)
+        user = request.user
+
+        if product in user.profile.cart.all():
+            user.profile.cart.remove(product)
+            return JsonResponse({'is_in_cart': False})
+        else:
+            user.profile.cart.add(product)
+            return JsonResponse({'is_in_cart': True})
+
 
 
 @login_required
