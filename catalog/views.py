@@ -14,40 +14,61 @@ from django.shortcuts import render, get_object_or_404
 from .models import Category, Item
 
 
-def catalog_list(request):
-    categories = Category.objects.all()
-    category_id = request.GET.get('category_id')
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'catalog/catalog_list.html'
+    context_object_name = 'categories'
 
-    if category_id:
-        category = get_object_or_404(Category, id=category_id)
-        items = category.items.all()
-    else:
-        items = Item.objects.all()
+    def get_queryset(self):
+        return Category.objects.filter(archived=False)
 
-    context = {
-        'categories': categories,
-        'items': items,
-    }
-    return render(request, 'catalog/catalog_list.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category_id = self.request.GET.get('category_id')
+
+        if category_id:
+            context['items'] = Item.objects.filter(
+                category_id=category_id,
+                in_stock=True
+            ).select_related('category')
+
+        return context
 
 
-def items_by_category(request, category_id):
-    items = Item.objects.filter(category_id=category_id)
-    items_data = [{
-        'name': item.name,
-        'price': item.sale_price,
-        'image': item.photos.first().photo.url if item.photos.exists() else '',
-    } for item in items]
+class ItemListView(ListView):
+    model = Item
+    template_name = 'catalog/items_list.html'
+    context_object_name = 'items'
 
-    return JsonResponse({'items': items_data})
+    def get_queryset(self):
+        queryset = Item.objects.filter(
+            in_stock=True
+        ).prefetch_related('photos').select_related('category')
+
+        category_id = self.request.GET.get('category_id')
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        return queryset
+
+
+# def items_by_category(request, category_id):
+#     items = Item.objects.filter(category_id=category_id)
+#     items_data = [{
+#         'name': item.name,
+#         'price': item.sale_price,
+#         'image': item.photos.first().photo.url if item.photos.exists() else '',
+#     } for item in items]
+#
+#     return JsonResponse({'items': items_data})
 
 
 # ListView for Items
-class ItemListView(ListView):
-    model = Item
-    template_name = 'catalog/item_list.html'
-    context_object_name = 'items'
-    paginate_by = 10
+# class ItemListView(ListView):
+#     model = Item
+#     template_name = 'catalog/item_list.html'
+#     context_object_name = 'items'
+#     paginate_by = 10
 
 
 # DetailView for an Item

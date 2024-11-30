@@ -11,11 +11,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv()
 
 
 def get_env_variable(var_name):
@@ -29,6 +32,7 @@ def get_env_variable(var_name):
 def get_env_or_default(var_name, default):
     return os.environ.get(var_name, default)
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -39,7 +43,6 @@ SECRET_KEY = 'django-insecure-hygqe!#2db=_4f&+7l@m9xcj$c@b9ep-^z_vr4*e#6+7%$v7hb
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -83,7 +86,6 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'trendhive.wsgi.application'
 
 AUTH_USER_MODEL = 'users.UserInstance'
@@ -93,14 +95,13 @@ AUTH_USER_MODEL = 'users.UserInstance'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trendhive2',
-        'USER': 'postgres',
-        'PASSWORD': 'P@ssw0rd!',
+        'NAME': get_env_variable('DB_NAME'),
+        'USER': get_env_variable('DB_USER'),
+        'PASSWORD': get_env_variable('DB_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -120,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -132,7 +132,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -142,6 +141,8 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',  # Path to the static folder
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

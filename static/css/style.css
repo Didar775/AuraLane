@@ -1,5 +1,23 @@
-/* Navbar Styling */
+/* Global Styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+main {
+    margin-top: 76px;
+    flex: 1;
+}
+
+/* Navbar Styles */
 .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
     padding: 15px 20px;
     background-color: #fff;
     border-bottom: 1px solid #eaeaea;
@@ -13,131 +31,284 @@
     font-size: 16px;
     color: #333;
     margin: 0 15px;
+    transition: color 0.3s ease;
 }
 
 .navbar-nav .nav-link:hover {
     color: #007bff;
 }
 
-.icons img {
-    height: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+/* Search Dropdown */
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.icons img:hover {
-    opacity: 0.8;
-}
-
-/* Hero Section */
-.hero-overlay {
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-overlay img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-}
-
-.gradient-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 50%);
-    z-index: 1;
-}
-
-.carousel-caption {
-    z-index: 2;
-    text-align: center;
-}
-
-.carousel-caption h1 {
-    font-size: 2.5rem;
-    color: #fff;
-}
-
-.carousel-caption p {
-    color: #ddd;
-}
-
-/* Search Bar Styling */
 .search-group {
     max-width: 400px;
     transition: all 0.3s ease;
-    margin-left: auto;
 }
 
 .search-group .form-control {
-    border: none;
-    box-shadow: none;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
 }
 
 .search-group .btn-dark {
     background-color: #333;
     border: none;
-    padding: 0 20px;
+    padding: 8px 20px;
+    border-radius: 4px;
 }
 
 .search-group .btn-dark:hover {
     background-color: #000;
 }
 
-/* Sidebar Styling */
+/* Icons */
+.icons svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.icons svg:hover {
+    transform: scale(1.1);
+}
+
+/* Sidebar Styles */
 .sticky-sidebar {
     position: sticky;
-    top: 0;
-    height: 100vh;
-    background-color: #ffffff;
-    border-right: 1px solid #ddd;
+    top: 76px;
+    height: calc(100vh - 76px);
+    border-right: 1px solid #eaeaea;
+    padding: 15px;
+    background: white;
     overflow-y: auto;
-    padding-top: 20px;
-    padding-left: 5px; /* Reduced padding for closer alignment */
 }
 
-.sidebar-aligned {
-    margin-left: 10px; /* Reduced margin to bring it closer to the logo */
-}
-
-.sidebar-aligned ul {
+/* Sidebar Styles */
+.category-item {
     margin: 0;
     padding: 0;
-}
-
-.category-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f1f1;
-    padding: 8px 10px; /* Reduced padding for tighter spacing */
+    border-bottom: 1px solid #f1f1f1; /* Optional divider */
 }
 
 .category-item a {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    text-decoration: none;
-    flex-grow: 1;
-    margin-left: 5px; /* Slight margin for clean spacing */
+    display: flex; /* Make the entire row a flex container */
+    justify-content: space-between; /* Space text and arrow evenly */
+    align-items: center; /* Align text and arrow vertically */
+    padding: 10px 15px; /* Add padding to make the area larger */
+    text-decoration: none; /* Remove underline */
+    color: #333; /* Default text color */
+    transition: all 0.3s ease; /* Smooth hover effect */
+    border-radius: 8px; /* Optional for rounded corners on hover */
+    width: 100%; /* Make the link take up the full width of the row */
+}
+
+.category-item a:hover {
+    background-color: #f8f9fa; /* Subtle hover background */
+    color: #007bff; /* Change text color on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow effect */
 }
 
 .category-item span {
+    font-size: 16px; /* Adjust the size of the arrow */
+    color: #333; /* Default color for the arrow */
+    transition: color 0.3s ease; /* Smooth hover effect for the arrow */
+}
+
+.category-item a:hover span {
+    color: #007bff; /* Change arrow color on hover */
+}
+
+
+/* Product Grid */
+.product-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Product Card */
+.product-card {
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    background: white;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Product Image */
+.product-image-container {
+    height: 300px;
+    width: 100%;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+.product-image {
+    max-width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+/* Product Details */
+.product-details {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.title {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 500;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.3;
+    height: 36px;
+}
+
+.rating {
+    color: #ffa41c;
+    font-size: 12px;
+}
+
+.price {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
     color: #333;
-    margin-left: 10px; /* Maintain spacing between text and ">" */
 }
 
-.category-item:hover {
-    background-color: #f8f8f8;
+/* Footer */
+footer {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+    margin-top: auto;
+    border-top: 1px solid #eaeaea;
 }
 
-.category-item:hover span {
-    color: #007bff;
+/* Container and Layout */
+.container-fluid {
+    padding: 0;
+    width: 100%;
+}
+
+.row {
+    margin: 0;
+    width: 100%;
+}
+
+/* Responsive Styles */
+@media (max-width: 1400px) {
+    .product-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .navbar-nav .nav-link {
+        margin: 0 10px;
+    }
+}
+
+@media (max-width: 992px) {
+    .product-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sticky-sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .navbar {
+        padding: 10px;
+    }
+
+    main {
+        margin-top: 65px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-brand img {
+        height: 32px;
+    }
+
+    .icons svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .product-card {
+        height: 350px;
+    }
+
+    .product-image-container {
+        height: 250px;
+    }
+
+    .category-item {
+        padding: 10px;
+    }
+}
+
+/* Utility Classes */
+.gap-3 {
+    gap: 1rem;
+}
+
+.list-unstyled {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Dropdown Animation */
+.dropdown-menu.show {
+    animation: fadeIn 0.2s ease-in-out;
 }
