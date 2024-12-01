@@ -23,6 +23,21 @@ main {
     border-bottom: 1px solid #eaeaea;
 }
 
+.navbar-brand img {
+    height: 40px;
+}
+
+.navbar-nav .nav-link {
+    font-size: 16px;
+    color: #333;
+    margin: 0 15px;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff;
+}
+
 /* Sidebar Styles */
 .sticky-sidebar {
     position: sticky;
@@ -58,13 +73,27 @@ main {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.category-item span {
+    font-size: 16px;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.category-item a:hover span {
+    color: #007bff;
+}
+
 /* Product Grid */
 .product-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Four products per row */
-    gap: 15px;
-    padding: 15px;
+    grid-template-columns: repeat(5, 1fr); /* Four products per row */
+    gap: 15px; /* Space between items */
+    padding: 15px; /* Adjust grid padding */
+    width: 100%; /* Full width of the container */
+    box-sizing: border-box; /* Prevent overflow */
 }
+
+
 
 /* Product Card */
 .product-card {
@@ -75,11 +104,13 @@ main {
     background: white;
     transition: box-shadow 0.3s ease;
     padding: 10px;
-    height: 320px;
+    height: 320px; /* Adjusted height */
+    width: 100%; /* Fit within grid */
+    box-sizing: border-box; /* Prevent overflow */
 }
 
 .product-card:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     cursor: pointer;
 }
 
@@ -90,7 +121,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 180px;
+    height: 150px; /* Adjusted image height */
     margin-bottom: 10px;
 }
 
@@ -100,26 +131,43 @@ main {
     object-fit: contain;
 }
 
+/* Fallback for Missing Images */
+.no-photo {
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background-color: #f8f8f8;
+}
+
 /* Favorite Button */
 .favorite-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 6px;
+    right: 6px;
     background: none;
     border: none;
     cursor: pointer;
     transition: transform 0.3s ease;
 }
 
+.favorite-btn:hover {
+    transform: scale(1.2);
+}
+
 .favorite-btn .heart-icon {
     width: 20px;
     height: 20px;
-    fill: none;
     stroke: #333;
+    fill: none;
     transition: fill 0.3s ease, stroke 0.3s ease;
 }
 
-.favorite-btn.active .heart-icon {
+.favorite-btn .heart-icon.filled {
     fill: #ff6b6b;
     stroke: #ff6b6b;
 }
@@ -127,8 +175,8 @@ main {
 /* Add to Cart Button */
 .add-to-cart-btn {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
+    bottom: 6px;
+    right: 6px;
     background: #333;
     border: none;
     border-radius: 50%;
@@ -143,8 +191,13 @@ main {
     transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.add-to-cart-btn.active {
-    background: #4caf50; /* Green for added to cart */
+.add-to-cart-btn:hover {
+    background: #555;
+    transform: scale(1.1);
+}
+
+.add-to-cart-btn.added {
+    background: #007bff;
 }
 
 /* Product Details */
@@ -193,4 +246,36 @@ main {
 .rating-count {
     font-size: 12px;
     color: #888;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1400px) {
+    .product-container {
+        grid-template-columns: repeat(3, 1fr); /* Three products for medium screens */
+    }
+}
+
+@media (max-width: 992px) {
+    .product-container {
+        grid-template-columns: repeat(2, 1fr); /* Two products for small screens */
+    }
+
+    .sticky-sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #eaeaea;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-container {
+        grid-template-columns: 1fr; /* One product per row for mobile */
+    }
+
+    .favorite-btn,
+    .add-to-cart-btn {
+        width: 30px;
+        height: 30px;
+    }
 }
