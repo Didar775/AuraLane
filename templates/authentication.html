@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Authentication</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'img/logo.png' %}" alt="Logo">
+            </a>
+        </div>
+    </nav>
+    <main class="container d-flex justify-content-center align-items-center">
+        <div class="card p-4 shadow-lg" style="width: 100%; max-width: 400px;">
+            <h2 class="text-center mb-4">Авторизация</h2>
+            <div id="message" class="alert alert-success text-center d-none" role="alert">
+                Код успешно отправлен. Проверьте SMS.
+            </div>
+            <div id="error" class="alert alert-danger text-center d-none" role="alert"></div>
+            <form id="phone-form" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="phone-number" class="form-label">Номер телефона</label>
+                    <input type="text" id="phone-number" class="form-control" placeholder="Введите номер телефона" required>
+                    <div class="invalid-feedback">Введите номер телефона.</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Отправить</button>
+            </form>
+            <form id="otp-form" class="needs-validation d-none mt-3" novalidate>
+                <div class="mb-3">
+                    <label for="otp-code" class="form-label">Код из SMS</label>
+                    <input type="text" id="otp-code" class="form-control" placeholder="Введите код из SMS" required>
+                    <div class="invalid-feedback">Введите код из SMS.</div>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Подтвердить</button>
+            </form>
+        </div>
+    </main>
+    <script>
+        const phoneForm = document.getElementById('phone-form');
+        const otpForm = document.getElementById('otp-form');
+        const phoneNumberInput = document.getElementById('phone-number');
+        const otpCodeInput = document.getElementById('otp-code');
+        const messageDiv = document.getElementById('message');
+        const errorDiv = document.getElementById('error');
+
+        phoneForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phoneNumber = phoneNumberInput.value;
+            try {
+                const response = await fetch('/api/auth/generate-otp/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone_number: phoneNumber }),
+                });
+                if (response.ok) {
+                    messageDiv.classList.remove('d-none');
+                    errorDiv.classList.add('d-none');
+                    phoneForm.classList.add('d-none');
+                    otpForm.classList.remove('d-none');
+                } else {
+                    const data = await response.json();
+                    errorDiv.textContent = data.error || 'Ошибка при отправке OTP.';
+                    errorDiv.classList.remove('d-none');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Ошибка сети. Попробуйте ещё раз.';
+                errorDiv.classList.remove('d-none');
+            }
+        });
+
+        otpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phoneNumber = phoneNumberInput.value;
+            const otpCode = otpCodeInput.value;
+            try {
+                const response = await fetch('/api/auth/verify-otp/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone_number: phoneNumber, code: otpCode }),
+                });
+                if (response.ok) {
+                    messageDiv.textContent = 'Вы успешно авторизовались!';
+                    messageDiv.classList.remove('d-none');
+                    errorDiv.classList.add('d-none');
+                } else {
+                    const data = await response.json();
+                    errorDiv.textContent = data.error || 'Неверный код.';
+                    errorDiv.classList.remove('d-none');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Ошибка сети. Попробуйте ещё раз.';
+                errorDiv.classList.remove('d-none');
+            }
+        });
+    </script>
+</body>
+</html>
