@@ -8,6 +8,11 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ('archived',)
     search_fields = ('name',)
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        return qs.filter(created_by=request.user)
+
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):

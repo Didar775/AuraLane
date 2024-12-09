@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Your Cart</h1>
+
+    {% if carts %}
+    <div class="row">
+        <!-- Cart Items -->
+        <div class="col-md-8">
+            {% for cart in carts %}
+            <div class="row align-items-center border-bottom py-3">
+                <!-- Product Image -->
+                <div class="col-md-2">
+                    <div class="product-image-container">
+                        {% if cart.item.photos.first %}
+                        <img src="{{ cart.item.photos.first.photo.url }}" alt="{{ cart.item.name }}" class="product-image img-fluid">
+                        {% else %}
+                        <div class="no-photo">No Image</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="col-md-6">
+                    <h6 class="title mb-2">{{ cart.item.name }}</h6>
+                    <p class="price">{{ cart.item.sale_price }} ₸</p>
+                </div>
+
+                <!-- Quantity Control -->
+                <div class="col-md-3 text-center">
+                    <form method="post" action="{% url 'sales:cart_order' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="cart_id" value="{{ cart.id }}">
+
+                        <div class="input-group">
+                            <!-- Decrease Quantity -->
+                            <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary">-</button>
+
+                            <!-- Current Quantity -->
+                            <input type="text" name="quantity" value="{{ cart.quantity }}" readonly class="form-control text-center" style="width: 50px;">
+
+                            <!-- Increase Quantity -->
+                            <button type="submit" name="action" value="increase" class="btn btn-outline-secondary">+</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Remove Item -->
+                <div class="col-md-1 text-end">
+                    <form method="post" action="{% url 'sales:cart_order' %}?cart_id={{ cart.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="_method" value="delete">
+                        <button type="submit" class="btn btn-danger btn-sm">&times;</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-md-4">
+            <div class="order-summary p-3 border rounded">
+                <h5>Order Summary</h5>
+                <p>Products Cost: <strong>{{ order.cart_prices }} ₸</strong></p>
+                <p>Discount: <strong>- {{ order.discount_price }} ₸</strong></p>
+                <p>Total: <strong>{{ order.total_price }} ₸</strong></p>
+                <button class="btn btn-primary w-100 mt-3">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center">
+        <p>Your cart is empty.</p>
+        <a href="{% url 'catalog:catalog-items' %}" class="btn btn-primary">Browse Catalog</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

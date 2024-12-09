@@ -4,7 +4,7 @@
 {% block title %}Catalog{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid my-5">
     <div class="row">
         <!-- Left Sidebar -->
         <div class="col-2 sticky-sidebar">
@@ -13,7 +13,6 @@
                 <li class="category-item">
                     <a href="{% url 'catalog:catalog-items' %}?category_id={{ category.id }}">
                         <span class="category-name">{{ category.name }}</span>
-                        <span class="category-arrow">&gt;</span>
                     </a>
                 </li>
                 {% endfor %}
@@ -22,22 +21,27 @@
 
         <!-- Product Grid -->
         <div class="col-10">
+            <!-- Search Query Message -->
+            {% if query %}
+            <div class="mb-4">
+                <h5>Search results for: <strong>{{ query }}</strong></h5>
+            </div>
+            {% endif %}
+
+            {% if items %}
             <div class="product-container">
                 {% for item in items %}
                 <div class="product-card">
-                    <!-- Product Image -->
-                    <div class="product-image-container">
-                        {% if item.photos.first %}
-                        <img src="{{ item.photos.first.photo.url }}" alt="{{ item.name }}" class="product-image">
-                        {% else %}
-                        <div class="no-photo">No Image</div>
-                        {% endif %}
-                        <button class="favorite-btn" onclick="toggleFavorite(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="heart-icon">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
-                    </div>
+                    <a href="{% url 'catalog:item_detail' item.id %}" class="product-link">
+                        <!-- Product Image -->
+                        <div class="product-image-container">
+                            {% if item.photos.first %}
+                            <img src="{{ item.photos.first.photo.url }}" alt="{{ item.name }}" class="product-image">
+                            {% else %}
+                            <div class="no-photo">No Image</div>
+                            {% endif %}
+                        </div>
+                    </a>
 
                     <!-- Product Details -->
                     <div class="product-details">
@@ -46,23 +50,29 @@
                         <p class="price">{{ item.sale_price }} ₸</p>
                         <div class="rating">
                             {% for i in range %}
-                            {% if i <= item.rating %}
+                            {% if i <= item.average_rating|default:0 %}
                             <span class="star filled">★</span>
                             {% else %}
                             <span class="star">★</span>
                             {% endif %}
                             {% endfor %}
-                            <span class="rating-count">({{ item.rating_count }})</span>
+                            <span class="rating-count">({{ item.ratings.count }})</span>
                         </div>
                     </div>
 
                     <!-- Add to Cart Button -->
-                    <button class="add-to-cart-btn" onclick="toggleCart(this)">
+                    <button class="add-to-cart-btn">
                         <span>+</span>
                     </button>
                 </div>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="text-center mt-5">
+                <p>No items found matching your query.</p>
+                <a href="{% url 'catalog:catalog-items' %}" class="btn btn-primary">Browse All Items</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

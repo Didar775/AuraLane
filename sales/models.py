@@ -35,18 +35,6 @@ class Sale(models.Model):
         return self.title
 
 
-class Cart(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, blank=True, null=True, verbose_name='товар')
-    quantity = models.IntegerField(default=1, blank=True, verbose_name='количество')
-
-    class Meta:
-        verbose_name = 'Корзина'
-        verbose_name_plural = 'Корзины'
-
-    def __str__(self):
-        return f'{self.item.name} - {self.quantity} штук'
-
-
 class Order(models.Model):
     STATUSES = [
         ('new', 'NEW'),
@@ -88,3 +76,18 @@ class Order(models.Model):
             self.save()
 
         return self.cart_prices + self.delivery_price - self.discount_price - self.bonus_price
+
+
+class Cart(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, blank=True, null=True, verbose_name='товар')
+    quantity = models.IntegerField(default=1, blank=True, verbose_name='количество')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='carts', blank=True, null=True,
+                              verbose_name='номер заказа')
+
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'
+
+    def __str__(self):
+        return f'{self.item.name} - {self.quantity} штук'
+

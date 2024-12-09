@@ -33,7 +33,12 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ['rating', 'pros', 'cons']
         widgets = {
-            'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
-            'pros': forms.Textarea(attrs={'rows': 3}),
-            'cons': forms.Textarea(attrs={'rows': 3}),
+            'rating': forms.Select(choices=[(i, i) for i in range(1, 6)], attrs={'class': 'form-select'}),
+            'pros': forms.Textarea(attrs={'rows': 2, 'class': 'form-control', 'placeholder': 'Pros'}),
+            'cons': forms.Textarea(attrs={'rows': 2, 'class': 'form-control', 'placeholder': 'Cons'}),
+        }
+        labels = {
+            'rating': 'Rating (1-5)',
+            'pros': 'Pros',
+            'cons': 'Cons',
         }

@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Avg
+
 from users.models import UserInstance
 
 
@@ -62,6 +64,15 @@ class Item(models.Model):
         brand = self.tags.filter(is_brand=True).first()
         return getattr(brand, 'name', '')
 
+    @property
+    def average_rating(self):
+        avg = self.ratings.aggregate(Avg('rating'))['rating__avg']
+        return round(avg, 1) if avg else 0
+
+    @property
+    def total_reviews(self):
+        return self.ratings.count()
+
 
 class ItemPhoto(models.Model):
     STATUSES = [
@@ -104,6 +115,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     pros = models.TextField(null=True, blank=True)
     cons = models.TextField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
     author = models.ForeignKey(UserInstance, on_delete=models.CASCADE, related_name='ratings', null=True, blank=True, )
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='ratings', null=True, blank=True)
 
@@ -112,4 +124,4 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
 
     def __str__(self):
-        return f'{self.author} - {self.rating}'
+        return f"{self.author.username} - {self.rating}"

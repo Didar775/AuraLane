@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Favorites{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4 text-center">Favorites</h1>
+
+    {% if favorite_items %}
+    <div class="row">
+        {% for favorite in favorite_items %}
+        <div class="col-md-3">
+            <div class="product-card">
+                <!-- Product Image -->
+                <a href="{% url 'catalog:item_detail' favorite.item.id %}" class="product-link">
+                    <div class="product-image-container">
+                        {% if favorite.item.photos.first %}
+                        <img src="{{ favorite.item.photos.first.photo.url }}" alt="{{ favorite.item.name }}" class="product-image">
+                        {% else %}
+                        <div class="no-photo">No Image</div>
+                        {% endif %}
+                    </div>
+                </a>
+
+                <!-- Product Details -->
+                <div class="product-details">
+                    <h6 class="title">{{ favorite.item.name }}</h6>
+                    <p class="price">{{ favorite.item.sale_price }} ₸</p>
+                </div>
+
+                <!-- Remove from Favorites Button -->
+                <form method="post" action="{% url 'catalog:favorites' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove"> <!-- Specify action -->
+                    <input type="hidden" name="item_id" value="{{ favorite.item.id }}"> <!-- Item ID -->
+                    <button type="submit" class="btn btn-danger w-100 mt-2">Remove</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center">
+        <p>
+            {% if request.user.is_authenticated %}
+            Your favorites list is empty.
+            {% else %}
+            Log in to save items to your favorites!
+            {% endif %}
+        </p>
+        <a href="{% url 'catalog:catalog-items' %}" class="btn btn-primary">Browse Catalog</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
