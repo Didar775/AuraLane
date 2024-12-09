@@ -1,3 +1,4 @@
+import requests
 from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -5,13 +6,27 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404, render
 from random import randint
+
+from trendhive.settings import get_env_variable
 from users.models import UserInstance
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
-
+from django.conf import settings
 
 def otp_auth_view(request):
     return render(request, 'authentication.html')
+
+
+def send_sms(url, data, headers):
+    try:
+        response = requests.post(url, json=data, headers=headers)
+        if response.status_code in [200, 201]:
+            uid = response.json().get('uid')
+            return Response({'uid': uid}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Failed to send SMS', 'details': response.text}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        return Response({'error': 'Network error', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GenerateOTPView(APIView):
@@ -20,10 +35,19 @@ class GenerateOTPView(APIView):
 
         if not phone_number:
             return Response({'error': 'Номер телефона обязателен'}, status=status.HTTP_400_BAD_REQUEST)
-
-        otp_code = randint(100000, 999999)
-        cache.set(f"otp:{phone_number}", otp_code, timeout=300)
-        print(f"OTP для {phone_number}: {otp_code}")
+        url = f"{get_env_variable('SMS_URL')}/api/create/"
+        headers = {
+            'Authorization': f"Bearer {get_env_variable('SMS_TOKEN')}",
+            'Content-Type': 'application/json'
+        }
+        data = {
+            'phone_number': phone_number
+        }
+        response = send_sms(url, data, headers)
+        if response.status_code not in [200,201]:
+            return Response({"error": "Can't send message", "status_code": response.status_code}, status=response.status_code)
+        print(response.data)
+        cache.set(str(phone_number), response.data.get("uid"), timeout=300)
 
         return Response({'message': 'OTP успешно сгенерирован'}, status=status.HTTP_200_OK)
 
@@ -31,19 +55,26 @@ class GenerateOTPView(APIView):
 class VerifyOTPView(APIView):
     def post(self, request):
         phone_number = request.data.get('phone_number')
-        otp_code = request.data.get('otp')
-
-        if not phone_number or not otp_code:
+        uid = cache.get(str(phone_number))
+        code = request.data.get('code')
+        if not phone_number or not uid:
             return Response({'error': 'Номер телефона и код обязательны'}, status=status.HTTP_400_BAD_REQUEST)
 
-        saved_otp = cache.get(f"otp:{phone_number}")
-        if not saved_otp:
-            return Response({'error': 'OTP истёк или недействителен'}, status=status.HTTP_400_BAD_REQUEST)
+        url = f"{get_env_variable('SMS_URL')}/api/verify/"
+        headers = {
+            'Authorization': f"Bearer {get_env_variable('SMS_TOKEN')}",
+            'Content-Type': 'application/json'
+        }
+        data = {
+            'uid': uid,
+            'code': code
+        }
+        response = send_sms(url, data, headers)
+        if response.status_code not in [200, 201]:
+            print(response.data)
+            return Response({"error": "Invalid code!", "status_code": response.status_code}, status=response.status_code)
 
-        if str(saved_otp) != str(otp_code):
-            return Response({'error': 'Неверный OTP'}, status=status.HTTP_400_BAD_REQUEST)
-
-        cache.delete(f"otp:{phone_number}")
+        cache.delete(phone_number)
 
         user, created = UserInstance.objects.get_or_create(phone_number=phone_number)
         refresh = RefreshToken.for_user(user)

@@ -82,7 +82,7 @@
                 const response = await fetch('/api/auth/verify-otp/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone_number: phoneNumber, otp: otpCode }),
+                    body: JSON.stringify({ phone_number: phoneNumber, code: otpCode }),
                 });
                 if (response.ok) {
                     messageDiv.textContent = 'Вы успешно авторизовались!';
