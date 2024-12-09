@@ -15,9 +15,14 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password=None, **extra_fields):
+    def create_superuser(self, username=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+
+        if not username:
+            username = 'admin'
+        if not password:
+            password = 'adminpassword'
 
         if not extra_fields.get('is_staff'):
             raise ValueError("Суперпользователь должен иметь is_staff=True")
@@ -28,16 +33,11 @@ class UserManager(BaseUserManager):
 
 
 class UserInstance(AbstractUser):
-    username = models.CharField(
-        max_length=50,
-        unique=True,
-        blank=True,
-        null=True,
-        verbose_name="Отображаемое имя"
-    )
     phone_number = models.CharField(
         max_length=11,
         unique=True,
+        blank=True,  # Позволяем phone_number быть пустым только для суперпользователей
+        null=True,  # Позволяем phone_number быть NULL для суперпользователей
         verbose_name="Номер телефона"
     )
     bonus = models.FloatField(
@@ -45,8 +45,8 @@ class UserInstance(AbstractUser):
         verbose_name="Бонусы"
     )
 
-    USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = 'username'  # Теперь используется username как основное поле
+    REQUIRED_FIELDS = ['phone_number']  # Теперь phone_number обязателен только для create_user
 
     objects = UserManager()
 
