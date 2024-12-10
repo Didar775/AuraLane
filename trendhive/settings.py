@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'django_celery_beat',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -119,6 +120,9 @@ CACHES = {
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+LOGIN_URL = "/api/auth/"
 
 WSGI_APPLICATION = 'trendhive.wsgi.application'
 

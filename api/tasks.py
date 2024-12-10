@@ -1,8 +1,10 @@
 import requests
+import logging
 from django.http import JsonResponse
 from django.core.cache import cache
 from trendhive.settings import get_env_variable
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def login_to_crm():
     url = get_env_variable("API_BASE_URL")+"token/"
@@ -55,16 +57,26 @@ from catalog.models import Category, Item
 @shared_task
 def fetch_categories_from_crm():
     headers = {'Authorization': f'Bearer {get_access_token()}'}
-    response = requests.get(f'{get_env_variable("API_BASE_URL")}items/', headers=headers)
+    response = requests.get(f'{get_env_variable("API_BASE_URL")}categories/', headers=headers)
     if response.status_code == 200:
         categories = response.json()
-        for category in categories:
+        for category_object in categories:
+            category_data = category_object.get('category', {})
+            if not category_data:
+                logging.error(f"Категория отсутствует в объекте: {category_object}")
+                continue
+
+            category_id = category_data.get('id')
+            if category_id is None:
+                logging.error(f"Ключ 'id' отсутствует в категории: {category_data}")
+                continue
+
             Category.objects.update_or_create(
-                id=category['id'],
+                id=category_id,
                 defaults={
-                    'name': category['name'],
-                    'archived': category['archived'],
-                    'href': category['href']
+                    'name': category_data.get('name', 'Без имени'),
+                    'archived': category_data.get('archived', False),
+                    'href': category_data.get('href', '#')
                 }
             )
     return f'{len(categories)} categories updated'
@@ -73,26 +85,47 @@ def fetch_categories_from_crm():
 @shared_task
 def fetch_items_from_crm():
     headers = {'Authorization': f'Bearer {get_access_token()}'}
-    response = requests.get(f'{get_env_variable("API_BASE_URL")}categories/', headers=headers)
-    print(headers, "\n\n\n\n\n")
+    response = requests.get(f'{get_env_variable("API_BASE_URL")}items/', headers=headers)
     if response.status_code == 200:
         items = response.json()
-        for item in items:
-            Item.objects.update_or_create(
+        logging.error(f"Fetched items: {items}")  # Логируем данные для отладки
+
+        for data in items:
+
+            item = data['item']  # Извлекаем вложенный объект item
+            category = data.get('category')  # Опционально обрабатываем category
+            photos = data.get('photos', [])  # Список фото, если нужно
+
+            item_instance, created = Item.objects.update_or_create(
                 id=item['id'],
                 defaults={
-                    'name': item['name'],
-                    'description': item['description'],
-                    'code': item['code'],
-                    'buy_price': item['buy_price'],
-                    'sale_price': item['sale_price'],
-                    'category_id': item['category'],
-                    'weight': item['weight'],
-                    'in_stock': item['in_stock'],
-                    'count': item['count'],
+                    'name': item.get('name', 'Unknown Name'),
+                    'description': item.get('description', ''),
+                    'code': item.get('code', ''),
+                    'buy_price': item.get('buy_price', 0.0),
+                    'sale_price': item.get('sale_price', 0.0),
+                    'category_id': item.get('category'),
+                    'weight': item.get('weight', 0.0),
+                    'in_stock': item.get('in_stock', False),
                     'sale_id': item.get('sale_id'),
-                    'tags_id': item.get('tags_id'),
-                    'shop_id': item.get('shop'),
                 }
             )
+            tags_ids = item.get('tags_id', [])
+            if tags_ids:
+                item_instance.tags.set(tags_ids)
+    else:
+        logging.error(f"Failed to fetch items: {response.status_code}, {response.text}")
+
     return f'{len(items)} items updated'
+
+
+def decrement(item_id, count=1):
+    headers = {'Authorization': f'Bearer {get_access_token()}'}
+    data = {
+        "count": count
+    }
+    response = requests.post(f'{get_env_variable("API_BASE_URL")}items/{item_id}/transaction/', headers=headers, json=data)
+    if response.status_code == 200:
+        return True
+    else:
+        return False
