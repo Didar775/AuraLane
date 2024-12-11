@@ -31,21 +31,22 @@
 
                 <!-- Quantity Control -->
                 <div class="col-md-3 text-center">
-                    <form method="post" action="{% url 'sales:cart_order' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="cart_id" value="{{ cart.id }}">
+                    <form method="post" action="{% url 'sales:cart_order' %}" >
+                    {% csrf_token %}
+                    <input type="hidden" name="cart_id" value="{{ cart.id }}">
 
-                        <div class="input-group">
-                            <!-- Decrease Quantity -->
-                            <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary">-</button>
+                    <div class="input-group">
+                        <!-- Decrease Quantity -->
+                        <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary">-</button>
 
-                            <!-- Current Quantity -->
-                            <input type="text" name="quantity" value="{{ cart.quantity }}" readonly class="form-control text-center" style="width: 50px;">
+                        <!-- Current Quantity -->
+                        <input type="text" name="quantity" value="{{ cart.quantity }}" readonly class="form-control text-center" style="width: 50px;">
 
-                            <!-- Increase Quantity -->
-                            <button type="submit" name="action" value="increase" class="btn btn-outline-secondary">+</button>
-                        </div>
-                    </form>
+                        <!-- Increase Quantity -->
+                        <button type="submit" name="action" value="increase" class="btn btn-outline-secondary">+</button>
+                    </div>
+                </form>
+
                 </div>
 
                 <!-- Remove Item -->

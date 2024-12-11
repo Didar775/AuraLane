@@ -34,7 +34,22 @@ class ItemListView(ListView):
 
         queryset = queryset.annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')
 
+        cart_item_ids = self.get_cart_item_ids()
+        for item in queryset:
+            item.in_cart = item.id in cart_item_ids
+
         return queryset
+
+    def get_cart_item_ids(self):
+        if self.request.user.is_authenticated:
+            order = Order.objects.filter(user=self.request.user, status="new").first()
+        else:
+            order_id = self.request.session.get("order_id")
+            order = Order.objects.filter(id=order_id, status="new").first()
+
+        if order:
+            return order.carts.values_list('item_id', flat=True)
+        return []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -98,24 +113,6 @@ def toggle_favorite(request, product_id):
             is_favorite = True
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
-
-@csrf_exempt
-def toggle_cart(request, product_id):
-    if request.method == 'POST':
-        product = get_object_or_404(Item, id=product_id)
-        user = request.user
-
-        if product in user.profile.cart.all():
-            user.profile.cart.remove(product)
-            return JsonResponse({'is_in_cart': False})
-        else:
-            user.profile.cart.add(product)
-            return JsonResponse({'is_in_cart': True})
-
-
-def auth_check(request):
-    return JsonResponse({'is_authenticated': request.user.is_authenticated})
 
 
 class FavoriteItemView(View):

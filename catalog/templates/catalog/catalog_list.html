@@ -61,7 +61,7 @@
                     </div>
 
                     <!-- Add to Cart Button -->
-                    <button class="add-to-cart-btn">
+                    <button class="add-to-cart-btn {% if item.in_cart %}added{% endif %}" onclick="toggleCart(this)"  data-item-id="{{item.id }}" >
                         <span>+</span>
                     </button>
                 </div>
