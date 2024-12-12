@@ -4,14 +4,19 @@
 
 {% block content %}
 <div class="container my-5">
+    <!-- Order History Button -->
+    <div class="text-end mb-3">
+        <a href="/shopping-history/" class="btn btn-secondary">View Order History</a>
+    </div>
+
     <h1 class="mb-4 text-center">Your Cart</h1>
 
     {% if carts %}
     <div class="row">
         <!-- Cart Items -->
-        <div class="col-md-8">
+        <div class="col-md-8" id="cart-section">
             {% for cart in carts %}
-            <div class="row align-items-center border-bottom py-3">
+            <div class="row align-items-center border-bottom py-3 cart-item" id="cart-item-{{ cart.id }}">
                 <!-- Product Image -->
                 <div class="col-md-2">
                     <div class="product-image-container">
@@ -31,31 +36,20 @@
 
                 <!-- Quantity Control -->
                 <div class="col-md-3 text-center">
-                    <form method="post" action="{% url 'sales:cart_order' %}" >
-                    {% csrf_token %}
-                    <input type="hidden" name="cart_id" value="{{ cart.id }}">
-
-                    <div class="input-group">
-                        <!-- Decrease Quantity -->
-                        <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary">-</button>
-
-                        <!-- Current Quantity -->
-                        <input type="text" name="quantity" value="{{ cart.quantity }}" readonly class="form-control text-center" style="width: 50px;">
-
-                        <!-- Increase Quantity -->
-                        <button type="submit" name="action" value="increase" class="btn btn-outline-secondary">+</button>
-                    </div>
-                </form>
-
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="cart_id" value="{{ cart.id }}">
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary cart-action" data-cart-id="{{ cart.id }}" data-action="decrease">-</button>
+                            <input type="text" name="quantity" value="{{ cart.quantity }}" readonly class="form-control text-center" style="width: 50px;">
+                            <button type="button" class="btn btn-outline-secondary cart-action" data-cart-id="{{ cart.id }}" data-action="increase">+</button>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Remove Item -->
                 <div class="col-md-1 text-end">
-                    <form method="post" action="{% url 'sales:cart_order' %}?cart_id={{ cart.id }}">
-                        {% csrf_token %}
-                        <input type="hidden" name="_method" value="delete">
-                        <button type="submit" class="btn btn-danger btn-sm">&times;</button>
-                    </form>
+                    <button type="button" class="btn btn-danger btn-sm delete-cart-item" data-cart-id="{{ cart.id }}">&times;</button>
                 </div>
             </div>
             {% endfor %}
@@ -68,7 +62,7 @@
                 <p>Products Cost: <strong>{{ order.cart_prices }} ₸</strong></p>
                 <p>Discount: <strong>- {{ order.discount_price }} ₸</strong></p>
                 <p>Total: <strong>{{ order.total_price }} ₸</strong></p>
-                <button class="btn btn-primary w-100 mt-3">Proceed to Checkout</button>
+                <button id="checkout-button" class="btn btn-primary w-100 mt-3">Proceed to Checkout</button>
             </div>
         </div>
     </div>

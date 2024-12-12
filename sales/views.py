@@ -14,10 +14,7 @@ User = get_user_model()
 
 class CartOrderView(View):
     def get_user_from_token(self, request):
-        """
-        Extract and authenticate the user from the access token in cookies.
-        Refresh the access token if expired using the refresh token.
-        """
+
         access_token = request.COOKIES.get('access_token')
         refresh_token = request.COOKIES.get('refresh_token')
 
@@ -71,13 +68,28 @@ class CartOrderView(View):
         return order
 
     def get(self, request):
-        """List all active carts and their associated order."""
         try:
-            order = self.get_order_for_user(request)
-            carts = order.carts.all()
-            return render(request, "sales/cart.html", {"carts": carts, "order": order})
+            user = self.get_user_from_token(request)
+            action = request.GET.get("action", "cart")
+
+            if action == "history":  # Show order history
+                # Fetch all completed orders for the user
+                completed_orders = Order.objects.filter(user=user, status="completed").order_by("-delivery_date")
+                return render(request, "sales/shopping_history.html", {"completed_orders": completed_orders})
+
+            elif action == "order_detail":  # Show details for a specific order
+                order_id = request.GET.get("order_id")
+                order = get_object_or_404(Order, id=order_id, user=user, status="completed")
+                carts = order.carts.select_related("item").all()
+                return render(request, "sales/order_detail.html", {"order": order, "carts": carts})
+
+            else:  # Default to showing the cart
+                order = self.get_order_for_user(request)
+                carts = order.carts.all()
+                return render(request, "sales/cart.html", {"carts": carts, "order": order})
+
         except AuthenticationFailed as e:
-            return JsonResponse({"error": str(e)}, status=401)
+            return redirect("/api/auth/")
 
     def post(self, request):
         """Handle cart actions such as adding, increasing, or decreasing items."""
@@ -100,9 +112,6 @@ class CartOrderView(View):
 
         # Retrieve the active order
         order = self.get_order_for_user(request)
-        print(action)
-        print(item_id)
-        print("Raw request body:", request.body)
 
         if action == "add":  # Add a new item to the cart
             if not item_id:
@@ -110,9 +119,14 @@ class CartOrderView(View):
             item = get_object_or_404(Item, id=item_id)
             cart, created = Cart.objects.get_or_create(item=item, order=order)
             if not created:
-                cart.quantity += 1  # Increment quantity if the item is already in the cart
+                cart.quantity += 1
                 cart.save()
-            return JsonResponse({"message": "Item added to cart."}, status=201)
+            return JsonResponse({
+                "message": "Item added to cart.",
+                "cart_prices": order.cart_prices,
+                "discount_price": order.discount_price,
+                "total_price": order.total_price
+            }, status=201)
 
         elif action in ["increase", "decrease"]:  # Update the quantity of a cart item
             if not cart_id:
@@ -125,30 +139,61 @@ class CartOrderView(View):
                 cart.quantity -= 1
 
             cart.save()
-            return JsonResponse({"message": "Cart updated.", "quantity": cart.quantity})
+            return JsonResponse({
+                "message": "Cart updated.",
+                "quantity": cart.quantity,
+                "cart_prices": order.cart_prices,
+                "discount_price": order.discount_price,
+                "total_price": order.total_price
+            })
+        elif action == "complete_order":  # Mark the order as completed
+            if not order:
+                return JsonResponse({"error": "No active order found."}, status=400)
+
+            # Change the order status to completed
+            order.status = "completed"
+            order.save()
+
+            # Fetch completed orders for the user
+            completed_orders = Order.objects.filter(user=order.user, status="completed")
+
+            # Include total_price in the response manually
+            completed_orders_data = [
+                {
+                    "id": completed_order.id,
+                    "created_at": completed_order.delivery_date.isoformat() if completed_order.delivery_date else None,
+                    "total_price": completed_order.total_price,  # Use the property to calculate
+                    "status": completed_order.status,
+                }
+                for completed_order in completed_orders
+            ]
+
+            return JsonResponse({
+                "message": "Order completed successfully!",
+                "completed_orders": completed_orders_data,
+            }, status=200)
 
         return HttpResponseBadRequest("Invalid action.")
 
     def delete(self, request, cart_id=None):
-        """Remove an item from the cart."""
         try:
             user = self.get_user_from_token(request)
         except AuthenticationFailed as e:
             return JsonResponse({"error": str(e)}, status=401)
 
         if not cart_id:
-            return HttpResponseBadRequest("Cart ID is required.")
+            cart_id = request.GET.get("cart_id")
+            if not cart_id:
+                return HttpResponseBadRequest("Cart ID is required.")
 
-        # Retrieve the active order
         order = self.get_order_for_user(request)
         cart = get_object_or_404(Cart, id=cart_id, order=order)
 
-        # Remove the cart item
         cart.delete()
 
-        # If the order has no more carts, mark it as canceled
         if not order.carts.exists():
             order.status = "canceled"
             order.save()
 
         return JsonResponse({"message": "Item removed from cart."}, status=204)
+

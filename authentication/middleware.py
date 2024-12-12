@@ -1,4 +1,6 @@
 import logging
+
+import requests
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.models import AnonymousUser
@@ -11,6 +13,8 @@ class TokenAuthMiddleware(MiddlewareMixin):
     """
 
     def process_request(self, request):
+        if request.path.startswith('/admin'):
+            return
         access_token = request.COOKIES.get('access_token')
 
         if access_token:

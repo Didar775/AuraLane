@@ -174,3 +174,155 @@ document.querySelectorAll('.cart-form').forEach(form => {
     });
 });
 
+document.querySelectorAll('.cart-action').forEach(button => {
+    button.addEventListener('click', async function (event) {
+        event.preventDefault(); // Prevent the form submission
+
+        const action = this.getAttribute('data-action'); // "increase" or "decrease"
+        const cartId = this.getAttribute('data-cart-id');
+
+        try {
+            const response = await fetch('/cart-order/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(), // CSRF token for security
+                },
+                body: JSON.stringify({
+                    action: action,
+                    cart_id: cartId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Cart updated:', data);
+
+            // Update the quantity in the UI
+            const inputField = this.parentElement.querySelector('input[name="quantity"]');
+            inputField.value = data.quantity;
+        } catch (error) {
+            console.error('Error updating cart:', error);
+        }
+    });
+});
+
+document.querySelectorAll('.delete-cart-item').forEach(button => {
+    button.addEventListener('click', async function (event) {
+        event.preventDefault(); // Prevent default behavior
+
+        const cartId = this.getAttribute('data-cart-id'); // Get cart ID
+
+        try {
+            const response = await fetch(`/cart-order/?cart_id=${cartId}`, {
+                method: 'DELETE', // Specify DELETE method
+                headers: {
+                    'X-CSRFToken': getCSRFToken(), // CSRF token for security
+                },
+            });
+
+            if (response.status === 204) {
+                console.log('Item deleted successfully');
+                // Optionally remove the item from the UI
+                this.closest('.row').remove();
+            } else {
+                throw new Error(`Failed to delete item. Status code: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error deleting cart item:', error);
+        }
+    });
+});
+
+
+document.querySelectorAll('.cart-action').forEach(button => {
+    button.addEventListener('click', async function (event) {
+        event.preventDefault(); // Prevent form submission
+
+        const action = this.getAttribute('data-action'); // "increase" or "decrease"
+        const cartId = this.getAttribute('data-cart-id');
+
+        try {
+            const response = await fetch('/cart-order/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(), // CSRF token for security
+                },
+                body: JSON.stringify({
+                    action: action,
+                    cart_id: cartId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Cart updated:', data);
+
+            // Update the quantity in the UI
+            const inputField = this.parentElement.querySelector('input[name="quantity"]');
+            inputField.value = data.quantity;
+
+            // Update the Order Summary dynamically
+            document.querySelector('.order-summary').innerHTML = `
+                <h5>Order Summary</h5>
+                <p>Products Cost: <strong>${data.cart_prices} ₸</strong></p>
+                <p>Discount: <strong>- ${data.discount_price} ₸</strong></p>
+                <p>Total: <strong>${data.total_price} ₸</strong></p>
+                <button class="btn btn-primary w-100 mt-3">Proceed to Checkout</button>
+            `;
+        } catch (error) {
+            console.error('Error updating cart:', error);
+        }
+    });
+});
+
+document.getElementById('checkout-button').addEventListener('click', async function () {
+    try {
+        const response = await fetch('/cart-order/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ action: "complete_order" }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to complete order: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data.message);
+
+        // Clear the cart section
+        document.getElementById('cart-section').innerHTML = '<p>Your cart is now empty!</p>';
+
+        // Update the shopping history dynamically
+        const historySection = document.getElementById('shopping-history');
+        historySection.innerHTML = ''; // Clear any existing history
+
+        data.completed_orders.forEach(order => {
+            const orderElement = `
+                <div class="list-group-item">
+                    <h5>Order #${order.id}</h5>
+                    <p>Placed on: ${new Date(order.created_at).toLocaleDateString()}</p>
+                    <p>Total: <strong>${order.total_price} ₸</strong></p>
+                    <p>Status: <span class="badge bg-success">${order.status}</span></p>
+                </div>
+            `;
+            historySection.innerHTML += orderElement;
+        });
+    } catch (error) {
+        console.error('Error completing order:', error);
+        alert("An error occurred while completing your order. Please try again.");
+    }
+});
+
+
